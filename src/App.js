@@ -1,23 +1,19 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from 'react';
+import { Row, Col } from 'react-bootstrap';
+import { FirstComponent, SecondComponent } from './components';
 
 function App() {
+  const [todos, setTodos] = useState([]);
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Row className="m-5">
+        <Col sm={12} md={6}>
+          <FirstComponent todos={todos} setTodos={setTodos} />
+        </Col>
+        <Col sm={12} md={6}>
+          <SecondComponent todos={todos} setTodos={setTodos} />
+        </Col>
+      </Row>
     </div>
   );
 }
