@@ -1,23 +1,25 @@
-import React, { useContext, useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Button, Row, Col } from 'react-bootstrap';
-import { TODO_CONTEXT } from '../context';
-import useLocalStorage from '../useLocalStorage';
 import MainContainer from './MainContainer';
 
-const SecondComponent = ({ setTodo }) => {
-  const { todos, dispatch } = useContext(TODO_CONTEXT);
-
+const SecondComponent = () => {
   // if you check the localStorage, they are saved in there.
-  const [filteredTodos, setFilteredTodos] = useLocalStorage('todos', []);
+  const { todos, filteredTodos } = useSelector(state => state.app);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    setFilteredTodos(
-      todos.sort((a, b) => {
-        if (a.completed && !b.completed) return 1;
-        if (!a.completed && !a.completed) return -1;
-        if (a.completed && b.completed) return 0;
-      })
-    );
+    const filteredTodos = todos.sort((a, b) => {
+      if (a.completed && !b.completed) return 1;
+      if (!a.completed && !a.completed) return -1;
+      return 0;
+    });
+    dispatch({
+      type: 'SET_FILTERED_TODOS',
+      payload: {
+        filteredTodos,
+      },
+    });
   }, [todos]);
 
   //just for the purpose of using useMemo
@@ -31,10 +33,7 @@ const SecondComponent = ({ setTodo }) => {
 
   const editHandler = (value, id) => {
     dispatch({ type: 'SET_ACTION', payload: { action: 'edit' } });
-    setTodo({
-      id,
-      value,
-    });
+    dispatch({ type: 'SET_TODO', payload: { id, value } });
   };
 
   const completeHandler = id => {
@@ -54,7 +53,11 @@ const SecondComponent = ({ setTodo }) => {
               type="checkbox"
               onClick={() => completeHandler(id)}
             />
-            <span Style={completed ? 'text-decoration: line-through;' : ''}>
+            <span
+              style={{
+                textDecoration: `${completed ? 'line-through' : 'none'}`,
+              }}
+            >
               {value}
             </span>
           </Col>

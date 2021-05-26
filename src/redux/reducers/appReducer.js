@@ -1,27 +1,24 @@
-import React, { createContext, useReducer } from 'react';
-
 const initialState = {
   todos: [],
+  todo: {
+    id: undefined,
+    value: '',
+  },
+  filteredTodos: [],
   action: 'add',
 };
 
-export const TODO_CONTEXT = createContext(initialState);
-
-const { Provider } = TODO_CONTEXT;
-
-const reducer = (state = initialState, action = {}) => {
-  const { type, payload } = action;
-
-  switch (type) {
+export const appReducer = (state = initialState, action) => {
+  switch (action.type) {
     case 'ADD_TODOS':
       return {
         ...state,
         todos: [
           ...state.todos,
           {
-            id: payload?.id,
-            value: payload?.value,
-            completed: payload?.completed
+            id: action.payload?.id,
+            value: action.payload?.value,
+            completed: action.payload?.completed,
           },
         ],
       };
@@ -29,10 +26,10 @@ const reducer = (state = initialState, action = {}) => {
       return {
         ...state,
         todos: state.todos.map(item => {
-          return item.id === payload.id
+          return item.id === action.payload.id
             ? {
                 ...item,
-                value: payload.value,
+                value: action.payload.value,
               }
             : item;
         }),
@@ -40,18 +37,18 @@ const reducer = (state = initialState, action = {}) => {
     case 'DELETE_TODOS':
       return {
         ...state,
-        todos: state.todos.filter(({ id: item }) => item !== payload.id),
+        todos: state.todos.filter(({ id: item }) => item !== action.payload.id),
       };
     case 'SET_ACTION':
       return {
         ...state,
-        action: payload.action,
+        action: action.payload.action,
       };
     case 'SET_COMPLETE':
       return {
         ...state,
         todos: state.todos.map(item => {
-          if (item.id === payload.id) {
+          if (item.id === action.payload.id) {
             return {
               ...item,
               completed: !item.completed,
@@ -60,15 +57,20 @@ const reducer = (state = initialState, action = {}) => {
           return item;
         }),
       };
+    case 'SET_TODO':
+      return {
+        ...state,
+        todo: {
+          ...state.todo,
+          ...action.payload,
+        },
+      };
+    case 'SET_FILTERED_TODOS':
+      return {
+        ...state,
+        filteredTodos: action.payload.filteredTodos,
+      };
     default:
       return state;
   }
 };
-
-const TodosProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(reducer, initialState);
-
-  return <Provider value={{ ...state, dispatch }}>{children}</Provider>;
-};
-
-export default TodosProvider;

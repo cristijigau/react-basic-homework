@@ -1,9 +1,10 @@
-import React, { useContext, useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Form, Button, Col } from 'react-bootstrap';
-import { TODO_CONTEXT } from '../context';
 
-const FirstComponent = ({ todo, setTodo }) => {
-  const { dispatch, action, todos } = useContext(TODO_CONTEXT);
+const FirstComponent = () => {
+  const { todos, todo, action } = useSelector(state => state.app);
+  const dispatch = useDispatch();
   const inputRef = useRef();
 
   const focus = () => {
@@ -32,9 +33,13 @@ const FirstComponent = ({ todo, setTodo }) => {
             });
           }
         }
-        setTodo({
-          id: undefined,
-          value: '',
+        dispatch({
+          type: 'SET_TODO',
+          payload: {
+            id: undefined,
+            value: '',
+            completed: false,
+          },
         });
       }
       if (action === 'edit') {
@@ -55,7 +60,7 @@ const FirstComponent = ({ todo, setTodo }) => {
         }
       }
     },
-    [todo.value, todo.id, dispatch]
+    [todo.value, todo.id]
   );
 
   return (
@@ -68,15 +73,21 @@ const FirstComponent = ({ todo, setTodo }) => {
             value={todo.value}
             onChange={({ target: { value } }) => {
               action === 'add'
-                ? setTodo({
-                    id: Math.random() * 100,
-                    value,
-                    completed: false,
+                ? dispatch({
+                    type: 'SET_TODO',
+                    payload: {
+                      id: Math.random() * 100,
+                      value,
+                      completed: false,
+                    },
                   })
-                : setTodo({
-                    id: todo.id,
-                    value,
-                    completed: false,
+                : dispatch({
+                    type: 'SET_TODO',
+                    payload: {
+                      id: todo.id,
+                      value,
+                      completed: false,
+                    },
                   });
             }}
           />
